@@ -59,5 +59,15 @@ Select Python Interpreter in VS Code:
 
 ### Links
 http://127.0.0.1:8000/api/v1/  
-http://127.0.0.1:8000/api/v1/bookings/  
 http://127.0.0.1:8000/api/v1/rooms/1/bookings/  
+
+### Curl
+
+1. create
+curl -X POST "http://127.0.0.1:8000/api/v1/rooms/1/bookings/" -H "Content-Type: application/json" -d '{"start_time": "2026-01-17T10:00:00","end_time": "2026-01-17T12:00:00"}'
+
+3. read
+curl http://127.0.0.1:8000/api/v1/rooms/1/bookings/
+
+2. delete
+curl -X DELETE "http://127.0.0.1:8000/api/v1/bookings/1"

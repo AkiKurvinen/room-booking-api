@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from app.db.session import SessionLocal
-from app.models.booking import Room, Booking as BookingModel
-from app.schemas.booking import BookingCreate, Booking as BookingSchema, Room
+from app.models.booking import Room as RoomModel, Booking as BookingModel
+from app.schemas.booking import BookingCreate, Booking as BookingSchema
 
 router = APIRouter()
 
@@ -17,12 +17,26 @@ def get_db():
 @router.post("/rooms/{room_id}/bookings/", response_model=BookingSchema)
 def create_booking_for_room(room_id: int, booking: BookingCreate, db: Session = Depends(get_db)):
     # Ensure the room exists
-    room = db.query(Room).filter(Room.id == room_id).first()
+    room = db.query(RoomModel).filter(RoomModel.id == room_id).first()
     if not room:
         raise HTTPException(status_code=404, detail="Room not found")
 
+    # Check for overlapping bookings
+    overlapping_booking = db.query(BookingModel).filter(
+        BookingModel.room_id == room_id,
+        BookingModel.start_time < booking.end_time,
+        BookingModel.end_time > booking.start_time
+    ).first()
+
+    if overlapping_booking:
+        raise HTTPException(status_code=400, detail="Booking times overlap with an existing booking")
+
     # Create the booking tied to the room
-    db_booking = BookingModel(**booking.dict(), room_id=room_id)
+    db_booking = BookingModel(
+        start_time=booking.start_time,
+        end_time=booking.end_time,
+        room_id=room_id
+    )
     db.add(db_booking)
     db.commit()
     db.refresh(db_booking)

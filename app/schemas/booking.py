@@ -1,7 +1,6 @@
 from pydantic import BaseModel
 
 class BookingBase(BaseModel):
-    room_id: int
     start_time: str
     end_time: str
 
@@ -10,6 +9,7 @@ class BookingCreate(BookingBase):
 
 class Booking(BookingBase):
     id: int
+    room_id: int  # room_id is still included in the response schema
 
     class Config:
         from_attributes = True

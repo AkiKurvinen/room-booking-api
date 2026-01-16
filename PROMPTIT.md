@@ -383,3 +383,53 @@ Would you like me to refactor the endpoints to follow this structure?
 ## Ok do it
 I have refactored the create_booking endpoint to tie it to a specific room and updated the endpoint path to /rooms/{room_id}/bookings/. The old create_booking endpoint has been removed for consistency. Let me know if you need further adjustments!
 
+## In current implementation, can bookings for same room overlap?
+In the current implementation, there is no mechanism to prevent overlapping bookings for the same room. The Booking model includes start_time and end_time, but there is no validation or database constraint to check for time conflicts when creating a new booking.
+
+Would you like me to add logic to prevent overlapping bookings for the same room?
+
+## Ok do it
+I have updated the create_booking_for_room endpoint to prevent overlapping bookings for the same room by checking for time conflicts before creating a new booking. Let me know if you need further adjustments!
+
+## Create curl test commands to try out this function.
+Here are the curl commands to test the create_booking_for_room function:
+
+1. Create a Room
+Before creating a booking, you need to create a room. Use the following command to create a room:
+curl -X POST "http://127.0.0.1:8000/rooms/" -H "Content-Type: application/json" -d '{"name": "Conference Room A"}'
+
+2. Create a Booking for the Room
+Replace {room_id} with the ID of the room created in the previous step:
+curl -X POST "http://127.0.0.1:8000/rooms/{room_id}/bookings/" -H "Content-Type: application/json" -d '{"start_time":"2026-01-17T10:00:00","end_time": "2026-01-17T12:00:00"}'
+
+3. Test Overlapping Booking
+Try creating another booking for the same room with overlapping times. Replace {room_id} with the same room ID:
+curl -X POST "http://127.0.0.1:8000/rooms/{room_id}/bookings/" -H "Content-Type: application/json" -d '{"start_time": "2026-01-17T11:00:00","end_time": "2026-01-17T13:00:00"}'
+
+This should return an error indicating that the booking times overlap.
+
+4. Delete a Booking
+Replace {booking_id} with the ID of the booking you want to delete:
+curl -X DELETE "http://127.0.0.1:8000/bookings/{booking_id}"
+
+5. List All Bookings for a Room
+Replace {room_id} with the room ID to list all bookings for that room:
+curl -X GET "http://127.0.0.1:8000/rooms/{room_id}/bookings/"
+
+These commands will help you test the functionality of the create_booking_for_room endpoint and related features. Let me know if you need further assistance!
+
+
+## Create curl example for @router.post("/rooms/{room_id}/bookings/
+Here is a curl example for the POST /rooms/{room_id}/bookings/ endpoint:
+
+Create a Booking for a Room
+Replace {room_id} with the ID of the room you want to create a booking for:
+curl -X POST "http://127.0.0.1:8000/rooms/{room_id}/bookings/" -H "Content-Type: application/json" -d '{
+  "start_time": "2026-01-17T10:00:00",
+  "end_time": "2026-01-17T12:00:00"
+}'
+
+## Why missing","loc":["body","room_id"]
+
+The error {"loc":["body","room_id"]} indicates that the API is expecting room_id in the request body, but it is not being provided. This happens because the BookingCreate schema still includes room_id as a required field, even though the room_id is now passed as a path parameter in the endpoint.
+
