@@ -21,7 +21,6 @@ python -m venv .venv
 .venv\Scripts\activate
 ```
 
-
 **Install Dependencies**
 ```bash
 pip install -r requirements.txt
@@ -57,3 +56,8 @@ Select Python Interpreter in VS Code:
 1. Open the Command Palette (Ctrl+Shift+P).
 2. Search for "Python: Select Interpreter".
 3. Choose the interpreter located in `.venv` (e.g., `.venv\Scripts\python.exe`).
+
+### Links
+http://127.0.0.1:8000/api/v1/  
+http://127.0.0.1:8000/api/v1/bookings/  
+http://127.0.0.1:8000/api/v1/rooms/1/bookings/  

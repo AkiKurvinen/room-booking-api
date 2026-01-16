@@ -6,7 +6,6 @@ from app.schemas.booking import BookingCreate, Booking as BookingSchema, Room
 
 router = APIRouter()
 
-# Dependency to get the database session
 def get_db():
     db = SessionLocal()
     try:
@@ -14,21 +13,25 @@ def get_db():
     finally:
         db.close()
 
-@router.get("/")
-def read_root():
-    return {"message": "Welcome to the Room Booking API!"}
+# CREATE
+@router.post("/rooms/{room_id}/bookings/", response_model=BookingSchema)
+def create_booking_for_room(room_id: int, booking: BookingCreate, db: Session = Depends(get_db)):
+    # Ensure the room exists
+    room = db.query(Room).filter(Room.id == room_id).first()
+    if not room:
+        raise HTTPException(status_code=404, detail="Room not found")
 
-@router.post("/bookings/", response_model=BookingSchema)
-def create_booking(booking: BookingCreate, db: Session = Depends(get_db)):
-    db_booking = BookingModel(**booking.dict())
+    # Create the booking tied to the room
+    db_booking = BookingModel(**booking.dict(), room_id=room_id)
     db.add(db_booking)
     db.commit()
     db.refresh(db_booking)
     return db_booking
 
-@router.get("/bookings/", response_model=list[BookingSchema])
-def read_bookings(db: Session = Depends(get_db)):
-    return db.query(BookingModel).all()
+# READ
+@router.get("/")
+def read_root():
+    return {"message": "Room Booking API is running"}
 
 @router.get("/rooms/{room_id}/bookings/", response_model=list[BookingSchema])
 def read_bookings_for_room(room_id: int, db: Session = Depends(get_db)):
@@ -36,3 +39,16 @@ def read_bookings_for_room(room_id: int, db: Session = Depends(get_db)):
     if not bookings:
         raise HTTPException(status_code=404, detail="No bookings found for this room")
     return bookings
+
+# UPDATE
+    """no endpoints"""
+
+# DELETE
+@router.delete("/bookings/{booking_id}", status_code=204)
+def delete_booking(booking_id: int, db: Session = Depends(get_db)):
+    booking = db.query(BookingModel).filter(BookingModel.id == booking_id).first()
+    if not booking:
+        raise HTTPException(status_code=404, detail="Booking not found")
+    db.delete(booking)
+    db.commit()
+    return None

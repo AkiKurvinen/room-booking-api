@@ -359,3 +359,27 @@ The endpoints have been updated to use the correct SQLAlchemy model (BookingMode
 
 The orm_mode configuration in the Pydantic schemas has been updated to from_attributes to comply with Pydantic v2 changes. This should resolve the warning. Let me know if you need further assistance!
 
+## Create delete endpoint for removing a booking by id
+I have added a delete endpoint to remove a booking by its ID. Let me know if you need further assistance!
+
+## The app should have 3 endpoints: create booking for room, delete booking, and read all bookings for a room. Should I make endpoints more consistent?
+
+Yes, making the endpoints more consistent will improve the API's usability and clarity. Based on your requirements, the endpoints can be structured as follows:
+
+Create a booking for a room:
+POST /rooms/{room_id}/bookings/
+This ties the booking creation directly to a specific room.
+
+Delete a booking:
+DELETE /bookings/{booking_id}
+This remains unchanged, as deleting a booking by its unique ID is logical.
+
+Read all bookings for a room:
+GET /rooms/{room_id}/bookings/
+This endpoint is already consistent with the task.
+
+Would you like me to refactor the endpoints to follow this structure?
+
+## Ok do it
+I have refactored the create_booking endpoint to tie it to a specific room and updated the endpoint path to /rooms/{room_id}/bookings/. The old create_booking endpoint has been removed for consistency. Let me know if you need further adjustments!
+
