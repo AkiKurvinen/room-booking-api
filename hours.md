@@ -6,4 +6,4 @@
 15.30-16.00 prevent overlapping bookings
 
 20.1.2025
-8.00-
+8.00-12.00 test automation and validation
