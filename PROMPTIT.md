@@ -456,4 +456,104 @@ Install the Python extension in VS Code if you haven't already.
 Go to your VS Code settings (Ctrl + ,) and search for "Black".
 Set "python.formatting.provider": "black" in your settings.json file.
 
+## Where should I place test files and what is the best test framework for current project?
+Where to Place Test Files
+For your current project structure, the best practice is to create a tests/ directory at the root level of your project. This keeps your test files organized and separate from your application code. The structure could look like this:
+room-booking-api/
+    tests/
+        __init__.py
+        test_main.py
+        api/
+            v1/
+                test_endpoints.py
+        db/
+            test_database.py
+            test_session.py
+        models/
+            test_booking.py
+            test_room.py
+        schemas/
+            test_booking.py
+Naming Convention: Use test_*.py for test files and test_* for test functions. This is the convention used by most Python test frameworks.
+Mirroring Structure: The tests/ directory should mirror the structure of your app directory to make it easier to locate related tests.
+2. Best Test Framework
+The best test framework for your project is pytest. It is widely used, simple to set up, and supports advanced features like fixtures, parameterized tests, and plugins.
 
+Why pytest?
+Ease of Use: Minimal boilerplate; you can write tests as simple functions.
+Powerful Features: Built-in fixtures, parameterized testing, and plugins.
+Compatibility: Works seamlessly with other libraries like unittest and mock.
+Community Support: Large community and extensive documentation.
+3. Setting Up pytest
+Install pytest:
+Run the following command to install pytest:
+
+## Is it typical for Python API project to create separate tests/ directory and not place test files along source files?
+Both approaches—placing test files in a separate tests/ directory or alongside source files—are common in Python projects. The choice depends on the project's size, team preferences, and organizational needs. Here's a breakdown:
+
+1. Separate tests/ Directory
+This is the most common practice for larger projects, especially for APIs and frameworks.
+
+Advantages:
+Separation of Concerns: Keeps the source code (app) clean and focused on functionality, while tests are isolated in their own directory.
+Scalability: Easier to manage as the project grows, especially with many test files.
+Standardization: Many frameworks and CI/CD tools expect a tests/ directory by default.
+Mirroring Structure: You can mirror the app structure in tests/, making it easy to locate related tests.
+When to Use:
+Larger projects with multiple modules.
+When you want to keep the source directory clean.
+If you plan to use CI/CD pipelines or tools that expect a tests/ directory.
+2. Tests Alongside Source Files
+This approach is more common in smaller projects or when the team prefers to keep tests close to the code they test.
+
+Advantages:
+Proximity: Tests are immediately visible next to the code they validate, making it easier to find and maintain them.
+Simpler Structure: No need to navigate between directories to find tests.
+Useful for Small Projects: Works well for small or single-module projects.
+When to Use:
+Small projects with few files.
+When the team prefers to keep tests close to the code.
+If the project is unlikely to grow significantly.
+Example Structure:
+
+app/
+    main.py
+    main_test.py
+    api/
+        v1/
+            endpoints.py
+            endpoints_test.py
+Which is Better for Your Project?
+For your current project, which is an API with a modular structure (app containing api/, db/, models/, etc.), using a separate tests/ directory is the better choice. It aligns with best practices for scalable Python API projects and keeps the source code clean.
+
+## What is warning declarative_base() function is now available as sqlalchemy.orm.declarative_base()?
+The warning about declarative_base() being available as sqlalchemy.orm.declarative_base() is related to changes in SQLAlchemy's API in version 1.4 and later.
+
+Explanation:
+In earlier versions of SQLAlchemy, declarative_base() was imported from sqlalchemy.ext.declarative.
+Starting with SQLAlchemy 1.4, declarative_base() has been moved to sqlalchemy.orm to better align with the ORM's structure.
+While sqlalchemy.ext.declarative.declarative_base still works, it is considered deprecated and will eventually be removed in future versions.
+Solution:
+To resolve the warning, update your import to use the new location:
+
+Current Code:
+from sqlalchemy.ext.declarative import declarative_base
+Updated Code:
+from sqlalchemy.orm import declarative_base
+
+##  PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead.
+The warning PydanticDeprecatedSince20: Support for class-based config is deprecated, use ConfigDict instead is related to changes introduced in Pydantic v2.0. In Pydantic v1.x, you could define configuration for models using a nested class Config. However, in Pydantic v2.x, this approach is deprecated, and you should use the new ConfigDict instead.
+
+Solution: Update to ConfigDict
+Old Approach (Deprecated in Pydantic v2.x):
+New Approach (Pydantic v2.x):
+Explanation of Changes:
+ConfigDict:
+
+ConfigDict is a dictionary-based configuration system introduced in Pydantic v2.x.
+It replaces the class Config approach.
+The from_attributes key in ConfigDict is equivalent to orm_mode = True in the old Config.
+Why the Change?
+
+The new approach is more explicit and aligns better with modern Python practices.
+It simplifies the configuration system and avoids potential issues with class-based inheritance.

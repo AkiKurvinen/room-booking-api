@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class BookingBase(BaseModel):
@@ -12,10 +12,9 @@ class BookingCreate(BookingBase):
 
 class Booking(BookingBase):
     id: int
-    room_id: int  # room_id is still included in the response schema
+    room_id: int
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class RoomBase(BaseModel):
@@ -30,5 +29,4 @@ class Room(RoomBase):
     id: int
     bookings: list[Booking] = []
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

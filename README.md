@@ -47,6 +47,7 @@ uvicorn app.main:app --reload
 ```bash
 black .
 ```
+
 ## Additional dev tips
 
 ### SQLite database
