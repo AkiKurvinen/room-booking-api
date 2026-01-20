@@ -541,7 +541,7 @@ from sqlalchemy.ext.declarative import declarative_base
 Updated Code:
 from sqlalchemy.orm import declarative_base
 
-##  PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead.
+## PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead.
 The warning PydanticDeprecatedSince20: Support for class-based config is deprecated, use ConfigDict instead is related to changes introduced in Pydantic v2.0. In Pydantic v1.x, you could define configuration for models using a nested class Config. However, in Pydantic v2.x, this approach is deprecated, and you should use the new ConfigDict instead.
 
 Solution: Update to ConfigDict
@@ -557,3 +557,113 @@ Why the Change?
 
 The new approach is more explicit and aligns better with modern Python practices.
 It simplifies the configuration system and avoids potential issues with class-based inheritance.
+
+## Does pytest work although the app is not running in other terminal?
+Yes, pytest can still work even if the app is not running in another terminal. This is because pytest is designed to test Python code directly, without requiring the app to be actively running as a separate process.
+
+How pytest Works:
+Unit Tests: pytest can test individual functions, classes, or modules in isolation. These tests do not depend on the app being actively running.
+Integration Tests: If your tests require the app to be running (e.g., testing API endpoints), you can use tools like TestClient from FastAPI or requests to simulate requests without needing the app to run in a separate terminal.
+Example: Testing Without Running the App
+For a FastAPI app, you can use TestClient to test endpoints directly:
+
+from fastapi.testclient import TestClient
+from app.main import app
+
+client = TestClient(app)
+
+def test_read_root():
+    response = client.get("/")
+    assert response.status_code == 200
+    assert response.json() == {"message": "Hello, World!"}
+
+In this example:
+
+The app does not need to be running in another terminal.
+TestClient spins up a temporary instance of the app for testing.
+When the App Needs to Be Running
+If your tests depend on external services (e.g., a database, message broker, or other APIs), you may need to:
+
+Mock Dependencies: Use libraries like unittest.mock or pytest-mock to simulate external services.
+Run Services Locally: Use tools like Docker Compose to spin up the required services for testing.
+
+
+## App uses sqlite and I want to create E2E test.
+To create an end-to-end (E2E) test for your app using SQLite, you can use a temporary in-memory SQLite database for testing. This ensures that your tests do not interfere with the production database and remain isolated.
+
+Here’s how you can set up an E2E test for your app:
+Steps to Create an E2E Test
+Use a Temporary SQLite Database:
+
+SQLite supports in-memory databases (sqlite:///:memory:), which are perfect for testing as they are fast and do not persist data.
+Override the Database Connection:
+
+Modify your app to allow overriding the database URL during testing. This can be done by using environment variables or dependency injection.
+Set Up Test Fixtures:
+
+Use pytest fixtures to create and tear down the database for each test.
+Write the E2E Test:
+
+Use TestClient from FastAPI to simulate requests to your app.
+Example Implementation
+1. Modify session.py to Support Test Databases
+Update your session.py to allow overriding the database URL:
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, declarative_base
+
+# Default database URL
+SQLALCHEMY_DATABASE_URL = "sqlite:///./room_booking.db"
+
+# Allow overriding the database URL for testing
+def get_engine(database_url=SQLALCHEMY_DATABASE_URL):
+    connect_args = {"check_same_thread": False} if "sqlite" in database_url else {}
+    return create_engine(database_url, connect_args=connect_args)
+
+engine = get_engine()
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base = declarative_base()
+
+## Does the test use path prefix /api/v1/?
+
+The current test file does not use the /api/v1/ path prefix. The endpoints being tested (e.g., /, /bookings/) are accessed directly without the prefix.
+
+If your API uses /api/v1/ as a path prefix, you should update the test URLs to include it. For example:
+
+Replace / with /api/v1/
+Replace /bookings/ with /api/v1/bookings/
+Would you like me to update the test file to include the /api/v1/ prefix?
+
+## Should API url be in .env? How otherwise I can utilize .env file in this project?
+Should the API URL Be in .env?
+Yes, storing the API URL in a .env file is a good practice, especially if the URL changes between environments (e.g., development, staging, production). This allows you to:
+
+Avoid hardcoding URLs in your code.
+Easily switch between environments by modifying the .env file.
+Keep sensitive information (e.g., database credentials, API keys) out of your source code.
+For example, you can add the following to your .env file:
+
+Then, in your code, you can load the .env file and use the API_URL variable.
+
+How to Utilize .env in This Project
+You can use the python-dotenv library to load environment variables from a .env file. Here's how:
+
+1. Install python-dotenv
+Run the following command to install the library:
+
+Add it to your requirements.txt:
+
+2. Create a .env File
+Create a .env file in the root of your project and add environment-specific variables. For example:
+
+3. Load .env Variables in Your Code
+Update your app's entry point (e.g., main.py) to load the .env file:
+
+4. Use the Variables in Your Code
+Replace hardcoded values with the environment variables. For example:
+
+In your tests:
+In your database configuration:
+Benefits of Using .env
+Flexibility: Easily switch between environments without modifying the code.
+Security: Keep sensitive information out of the source code.
+Maintainability: Centralize configuration in one place.

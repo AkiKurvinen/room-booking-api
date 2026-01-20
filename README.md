@@ -25,6 +25,8 @@ python -m venv .venv
 .venv\Scripts\activate
 ```
 
+- Rename and edit if necessary dotenv_example
+
 **Install Dependencies**
 ```bash
 pip install -r requirements.txt
