@@ -33,6 +33,12 @@ def create_booking_for_room(
             status_code=400, detail="Booking time cannot be in the past"
         )
 
+    # Ensure the end time is not before the start time
+    if booking.end_time <= booking.start_time:
+        raise HTTPException(
+            status_code=400, detail="End time cannot be before or equal to start time"
+        )
+
     # Check for overlapping bookings
     overlapping_booking = (
         db.query(Booking)

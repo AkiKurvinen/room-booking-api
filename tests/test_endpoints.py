@@ -2,7 +2,6 @@ import os
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
 
-# Load environment variables from .env file
 load_dotenv()
 
 API_PREFIX = os.getenv("API_URL", "/api/v1")
@@ -14,14 +13,11 @@ def test_getclient(client):
 
 
 def test_create_booking_in_past(client):
-    # Calculate yesterday's date
     yesterday = datetime.now() - timedelta(days=1)
     start_time = yesterday.replace(
         hour=10, minute=0, second=0, microsecond=0
     ).isoformat()
     end_time = yesterday.replace(hour=12, minute=0, second=0, microsecond=0).isoformat()
-
-    # Attempt to create a booking in the past
     response = client.post(
         f"{API_PREFIX}/rooms/1/bookings/",
         json={"start_time": start_time, "end_time": end_time},
@@ -31,19 +27,16 @@ def test_create_booking_in_past(client):
 
 
 def test_create_booking(client):
-    # Calculate tomorrow's date
     tomorrow = datetime.now() + timedelta(days=1)
     start_time = tomorrow.replace(
         hour=10, minute=0, second=0, microsecond=0
     ).isoformat()
     end_time = tomorrow.replace(hour=12, minute=0, second=0, microsecond=0).isoformat()
 
-    # Attempt to create a booking for tomorrow
     response = client.post(
         f"{API_PREFIX}/rooms/1/bookings/",
         json={"start_time": start_time, "end_time": end_time},
     )
-    print("Response Detail:", response.json())
     assert response.status_code == 200
     assert response.json()["start_time"] == start_time
 
@@ -55,20 +48,7 @@ def test_get_bookings(client):
 
 
 def test_create_overlapping_booking(client):
-    # Calculate tomorrow's date
     tomorrow = datetime.now() + timedelta(days=1)
-    start_time = tomorrow.replace(
-        hour=10, minute=0, second=0, microsecond=0
-    ).isoformat()
-    end_time = tomorrow.replace(hour=12, minute=0, second=0, microsecond=0).isoformat()
-
-    # Create an initial booking
-    client.post(
-        f"{API_PREFIX}/rooms/1/bookings/",
-        json={"start_time": start_time, "end_time": end_time},
-    )
-
-    # Attempt to create an overlapping booking
     overlapping_start = tomorrow.replace(
         hour=11, minute=0, second=0, microsecond=0
     ).isoformat()
@@ -83,6 +63,29 @@ def test_create_overlapping_booking(client):
     assert "overlap" in response.json()["detail"].lower()
 
 
+def test_create_booking_with_end_time_before_start_time(client):
+    tomorrow = datetime.now() + timedelta(days=1)
+    payload = {
+        "start_time": tomorrow.replace(
+            hour=10, minute=0, second=0, microsecond=0
+        ).isoformat(),
+        "end_time": tomorrow.replace(
+            hour=9, minute=0, second=0, microsecond=0
+        ).isoformat(),
+    }
+
+    response = client.post(f"{API_PREFIX}/rooms/1/bookings/", json=payload)
+
+    assert response.status_code == 400
+    assert "cannot be before" in response.json()["detail"].lower()
+
+
 def test_delete_booking(client):
     response = client.delete(f"{API_PREFIX}/bookings/1")
     assert response.status_code == 200
+
+
+def test_delete_non_existent_booking(client):
+    response = client.delete(f"{API_PREFIX}/bookings/1")
+    assert response.status_code == 404
+    assert "not found" in response.json()["detail"].lower()

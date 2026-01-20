@@ -838,3 +838,22 @@ I have configured the tests in conftest.py to use a separate SQLite database (te
 ## Tests are failing because they use same db as the main app. Configure project so that new database is initialized when testing.
 
 The test_db fixture has been updated to use a separate temporary SQLite database for testing, and the missing imports for create_engine and sessionmaker have been added. There are no further errors in the conftest.py file. You can now re-run your tests to verify that they use an isolated test database. Let me know if you need further assistance!
+
+## Does it have check that end time cannot be before start time?
+The current implementation in endpoints.py does not explicitly check if the end_time is before the start_time. It only ensures:
+
+The booking time is not in the past.
+There are no overlapping bookings.
+
+## Add test case for this
+A test case has been added to verify that the API raises an error when end_time is before or equal to start_time. There are no errors in the updated test file. You can now run your tests to confirm the behavior. Let me know if you need further assistance!
+
+## Create test case for attempting to delete booking that does not exsist.
+A test case has been added to verify the behavior when attempting to delete a non-existent booking. There are no errors in the updated file. You can now run your tests to confirm the functionality. Let me know if you need further assistance!
+
+def test_delete_non_existent_booking(client):
+    response = client.delete(f"{API_PREFIX}/bookings/1")
+    assert response.status_code == 404
+    assert "not found" in response.json()["detail"].lower()
+
+
