@@ -856,4 +856,66 @@ def test_delete_non_existent_booking(client):
     assert response.status_code == 404
     assert "not found" in response.json()["detail"].lower()
 
+## How might I improve APi security? Should I create JWT auth endpoints and verification?
+Improving API security is essential, and implementing JWT (JSON Web Token) authentication is a great step. Here's how you can enhance your API security and why JWT authentication is a good choice:
 
+Why Use JWT Authentication?
+Stateless Authentication: JWTs allow you to authenticate users without maintaining session state on the server.
+Secure Token: Tokens are signed, ensuring they cannot be tampered with.
+Scalable: Ideal for distributed systems since no session storage is required.
+Custom Claims: You can include user roles, permissions, or other claims in the token payload.
+Steps to Improve API Security
+1. Implement JWT Authentication
+Create Auth Endpoints:
+/login: Accepts user credentials, validates them, and returns a JWT.
+/register: Allows users to create accounts (optional, depending on your app).
+Verify JWT:
+Protect sensitive endpoints by requiring a valid JWT in the Authorization header.
+2. Use HTTPS
+Ensure all communication between the client and server is encrypted.
+3. Rate Limiting
+Prevent abuse by limiting the number of requests a client can make in a given time.
+4. Input Validation
+Validate all user inputs to prevent SQL injection, XSS, and other attacks.
+5. Role-Based Access Control (RBAC)
+Use roles (e.g., admin, user) to restrict access to certain endpoints.
+6. Secure Sensitive Data
+Hash passwords using a strong algorithm like bcrypt.
+Avoid storing sensitive data in JWT payloads.
+7. Token Expiry and Refresh
+Set a short expiration time for access tokens and implement refresh tokens for re-authentication.
+How to Add JWT Authentication
+Install Dependencies
+Example Implementation
+Generate JWT Token:
+
+Verify JWT Token:
+
+Protect Endpoints:
+
+Next Steps
+Let me know if you'd like me to implement JWT authentication in your project.
+If you have specific security concerns, we can address them further.
+
+
+## Can API files be simplified?
+o simplify the API files, you can focus on modularizing and organizing the code for better readability and maintainability. Here are some suggestions:
+
+1. Split Large Files into Smaller Modules
+If the endpoints.py file contains multiple endpoints, consider splitting them into separate files based on functionality. For example:
+rooms.py for room-related endpoints.
+bookings.py for booking-related endpoints.
+Example Structure:
+
+2. Use Dependency Injection for Common Logic
+Move shared logic (e.g., database session management, authentication) into reusable dependencies.
+Example:
+
+3. Group Related Endpoints
+Use routers to group endpoints logically. For example:
+4. Abstract Business Logic
+Move complex logic out of the endpoints and into service or utility modules.
+Example:
+
+5. Use Pydantic Models for Validation
+Ensure all request and response data is validated using Pydantic models.
