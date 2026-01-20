@@ -70,11 +70,11 @@ def read_bookings_for_room(room_id: int, db: Session = Depends(get_db)) -> List[
 
 
 # DELETE
-@router.delete("/bookings/{booking_id}", status_code=204)
-def delete_booking(booking_id: int, db: Session = Depends(get_db)) -> None:
+@router.delete("/bookings/{booking_id}", status_code=200)
+def delete_booking(booking_id: int, db: Session = Depends(get_db)) -> dict:
     booking = db.query(Booking).filter(Booking.id == booking_id).first()
     if not booking:
         raise HTTPException(status_code=404, detail="Booking not found")
     db.delete(booking)
     db.commit()
-    return None
+    return {"message": "Booking deleted successfully"}

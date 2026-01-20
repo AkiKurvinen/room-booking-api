@@ -799,6 +799,8 @@ Alternative Approaches
 Database Cleanup: Use Base.metadata.drop_all() and Base.metadata.create_all() to reset the database schema before each test.
 Mocking: If you want to avoid interacting with the real database, you can mock the database layer. However, this is less suitable for E2E tests.
 
+## update test_create_overlapping_booking test case
 
-## Add typehints
+I have updated the test_create_overlapping_booking test case in tests/test_endpoints.py. It now creates an initial valid booking and then attempts to create an overlapping booking, verifying the error response.
+
 
