@@ -667,3 +667,138 @@ Benefits of Using .env
 Flexibility: Easily switch between environments without modifying the code.
 Security: Keep sensitive information out of the source code.
 Maintainability: Centralize configuration in one place.
+
+## The test sould call /api/v1/rooms/{room_id}/bookings/
+
+The test has been updated to call the correct endpoint /api/v1/rooms/{room_id}/bookings/ for creating and retrieving bookings. You can now run the tests using pytest to verify the changes. Let me know if you need further assistance!
+
+## Example data sent is
+{
+"start_time": "string",
+"end_time": "string"
+}
+On success data received is
+{
+"start_time": "string",
+"end_time": "string",
+"id": 0,
+"room_id": 0
+}
+
+The test has been updated to match the example data sent and received for creating and retrieving bookings. It now uses the correct payload and validates the expected response structure. You can run the tests using pytest to verify the changes. Let me know if you need further assistance!
+
+## In this point does the test database already have room id 1?
+No, the test database does not automatically have a room_id of 1 unless it is explicitly created as part of the test setup. Since the test database is typically an in-memory SQLite database (or a temporary database), it starts empty unless you populate it with data before running the tests.
+
+How to Ensure room_id = 1 Exists
+You need to create the room in the test database before testing bookings. This can be done by:
+
+Adding a setup step in the test to insert a room.
+Using a pytest fixture to populate the database with initial data.
+
+## How do I add a room to test db without adding endpoint?
+To add a room to the test database without creating an endpoint, you can directly interact with the database session in your test setup. This involves using the SQLAlchemy models and session to insert the data programmatically.
+
+Steps to Add a Room to the Test Database
+Access the Database Session:
+Use the SessionLocal or a test-specific session to interact with the database.
+
+Use the Room Model:
+Import the Room model from your models directory and create a new room instance.
+
+Insert the Room:
+Add the room to the session and commit the transaction.
+
+## Should these classes be separeted into 2 files? (booking.py)
+Yes, it is a good practice to separate these classes (Room and Booking) into two files, especially as your project grows. This improves maintainability, readability, and scalability. Here's why:
+
+Reasons to Separate Classes into Different Files
+Single Responsibility Principle:
+
+Each file should focus on a single entity or concept. Keeping Room and Booking in separate files aligns with this principle.
+Scalability:
+
+If the Room or Booking class grows with additional methods, attributes, or relationships, separating them avoids clutter.
+Readability:
+
+Smaller, focused files are easier to read and understand.
+Ease of Collaboration:
+
+In a team, separating classes into different files reduces the likelihood of merge conflicts.
+Consistency:
+
+If other models in your project are already in separate files, it’s better to follow the same structure.
+
+## While running tests: Table 'rooms' is already defined for this MetaData instance. Does the test clean test db after running?
+
+The error Table 'rooms' is already defined for this MetaData instance typically occurs when the database schema is being redefined multiple times during the test run. This can happen if the test database is not properly cleaned up or reset between tests.
+
+Does the Test Clean the Test Database?
+By default, the test database is not automatically cleaned up after each test unless you explicitly configure it to do so. If you're using an in-memory SQLite database (sqlite:///:memory:), the database is reset when the connection is closed. However, if you're using a file-based SQLite database or another database backend, the schema and data persist unless explicitly dropped.
+
+How to Ensure the Test Database is Cleaned?
+1. Drop and Recreate the Schema Before Each Test
+You can use Base.metadata.drop_all() and Base.metadata.create_all() to reset the database schema before each test.
+
+Example:
+
+scope="function": Ensures the database is reset for each test function.
+autouse=True: Automatically applies this fixture to all tests.
+2. Use a Separate Database Session for Each Test
+Ensure that each test uses a fresh database session. This can be achieved by using SessionLocal in a fixture.
+
+Example:
+
+3. Use an In-Memory SQLite Database
+If you're not already using an in-memory SQLite database, switch to it for testing. This ensures the database is reset automatically after each test.
+
+Update your SQLALCHEMY_DATABASE_URL in the test configuration:
+
+Recommended Approach
+Combine the above methods for a robust solution:
+
+Use an in-memory SQLite database.
+Reset the schema before each test using Base.metadata.drop_all() and Base.metadata.create_all().
+
+## After creating a room directry into db the test automation should try adding booking then reading the booking and then call delete endpoint. Which approach best for this kind of E2E testing?
+For end-to-end (E2E) testing that involves creating a room, adding a booking, reading the booking, and then calling the delete endpoint, the best approach is to use pytest fixtures combined with FastAPI's TestClient. This ensures that each test is isolated, the database is properly cleaned up, and the test flow mimics real-world API usage.
+
+Recommended Approach for E2E Testing
+1. Use Fixtures for Setup and Cleanup
+Fixtures in pytest allow you to:
+
+Set up the database state before the test.
+Clean up the database after the test.
+Reuse setup logic across multiple tests.
+2. Test Flow
+The test should follow these steps:
+
+Create a Room: Add a room directly to the database or via the API.
+Add a Booking: Use the /rooms/{room_id}/bookings/ endpoint to create a booking.
+Read the Booking: Use the /rooms/{room_id}/bookings/{booking_id} endpoint to retrieve the booking.
+Delete the Booking: Use the /rooms/{room_id}/bookings/{booking_id} delete endpoint to remove the booking.
+Verify Deletion: Attempt to retrieve the deleted booking and ensure it no longer exists.
+3. Example Implementation
+Here’s how you can structure the test:
+
+Why This Approach Works
+Isolation:
+
+Each test runs in a clean database environment, ensuring no interference between tests.
+The SessionLocal fixture ensures that the database session is properly managed.
+Realistic Flow:
+
+The test mimics the actual API usage, making it a true end-to-end test.
+Error Detection:
+
+By verifying each step (create, read, delete, verify deletion), the test ensures that all endpoints work as expected.
+Reusability:
+
+The create_room fixture can be reused in other tests, reducing duplication.
+Alternative Approaches
+Database Cleanup: Use Base.metadata.drop_all() and Base.metadata.create_all() to reset the database schema before each test.
+Mocking: If you want to avoid interacting with the real database, you can mock the database layer. However, this is less suitable for E2E tests.
+
+
+## Add typehints
+
