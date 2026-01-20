@@ -29,7 +29,9 @@ def create_booking_for_room(
 
     # Ensure the booking time is not in the past
     if booking.start_time < datetime.now().isoformat():
-        raise HTTPException(status_code=400, detail="Booking time cannot be in the past")
+        raise HTTPException(
+            status_code=400, detail="Booking time cannot be in the past"
+        )
 
     # Check for overlapping bookings
     overlapping_booking = (
@@ -64,11 +66,14 @@ def read_root() -> dict:
 
 
 @router.get("/rooms/{room_id}/bookings/", response_model=List[BookingSchema])
-def read_bookings_for_room(room_id: int, db: Session = Depends(get_db)) -> List[Booking]:
+def read_bookings_for_room(
+    room_id: int, db: Session = Depends(get_db)
+) -> List[Booking]:
     bookings = db.query(Booking).filter(Booking.room_id == room_id).all()
     if not bookings:
         raise HTTPException(status_code=404, detail="No bookings found for this room")
     return bookings
+
 
 # UPDATE
 """no endpoints"""

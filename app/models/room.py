@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
 from app.db.session import Base
 
+
 class Room(Base):
     __tablename__ = "rooms"
 

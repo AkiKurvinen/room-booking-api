@@ -5,6 +5,7 @@ from app.db.database import Base, engine, SessionLocal, Room, Booking
 from app.db.session import get_db
 from datetime import datetime
 
+
 @pytest.fixture(scope="module")
 def test_db():
     # Create tables in the test database
@@ -29,6 +30,7 @@ def test_db():
         session.close()
         Base.metadata.drop_all(bind=engine)
 
+
 @pytest.fixture(scope="module")
 def client(test_db):
     # Override the database dependency
@@ -37,7 +39,9 @@ def client(test_db):
         from sqlalchemy.orm import sessionmaker
 
         test_engine = create_engine(f"sqlite:///{test_db}")
-        TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=test_engine)
+        TestingSessionLocal = sessionmaker(
+            autocommit=False, autoflush=False, bind=test_engine
+        )
         db = TestingSessionLocal()
         try:
             yield db
