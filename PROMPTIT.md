@@ -433,3 +433,27 @@ curl -X POST "http://127.0.0.1:8000/rooms/{room_id}/bookings/" -H "Content-Type:
 
 The error {"loc":["body","room_id"]} indicates that the API is expecting room_id in the request body, but it is not being provided. This happens because the BookingCreate schema still includes room_id as a required field, even though the room_id is now passed as a path parameter in the endpoint.
 
+
+## How do I add python black?
+To add Python Black to your project, follow these steps:
+
+1. Install Black
+Open a terminal and run the following command to install Black:
+If you want to ensure it's added to your project dependencies, you can add it to your requirements.txt file:
+2. Configure Black
+Black works out of the box, but you can customize its behavior by creating a pyproject.toml file in your project root (if it doesn't already exist). Add the following configuration:
+3. Format Your Code
+To format your code, run:
+This will format all Python files in your project.
+4. Integrate with VS Code
+Install the Python extension in VS Code if you haven't already.
+Go to your VS Code settings (Ctrl + ,) and search for "Black".
+Set "python.formatting.provider": "black" in your settings.json file.
+Would you like me to install Black for you or configure it in your project? - This will format all Python files in your project.
+
+4. Integrate with VS Code
+Install the Python extension in VS Code if you haven't already.
+Go to your VS Code settings (Ctrl + ,) and search for "Black".
+Set "python.formatting.provider": "black" in your settings.json file.
+
+

@@ -5,6 +5,10 @@
 - Cancel a room booking
 - View all bookings for single room
 
+## Tools & Tech
+- Python FastAPI
+- SQLite
+
 ## Installation
 
 **Create and Activate Virtual Environment**
@@ -39,10 +43,10 @@ uvicorn app.main:app --reload
 - See API running [http://127.0.0.1:8000/api/v1/](http://127.0.0.1:8000/api/v1/)
 - See API docs [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 
-## Tools & Tech
-- Python FastAPI
-- SQLite
-
+## Format code
+```bash
+black .
+```
 ## Additional dev tips
 
 ### SQLite database
