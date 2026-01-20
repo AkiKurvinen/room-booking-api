@@ -45,6 +45,11 @@ uvicorn app.main:app --reload
 - See API running [http://127.0.0.1:8000/api/v1/](http://127.0.0.1:8000/api/v1/)
 - See API docs [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 
+## Testing
+```bash
+pytest
+```
+
 ## Format code
 ```bash
 black .
@@ -71,7 +76,7 @@ http://127.0.0.1:8000/api/v1/rooms/1/bookings/
 ### Curl
 
 1. create
-curl -X POST "http://127.0.0.1:8000/api/v1/rooms/1/bookings/" -H "Content-Type: application/json" -d '{"start_time": "2026-01-17T10:00:00","end_time": "2026-01-17T12:00:00"}'
+curl -X POST "http://127.0.0.1:8000/api/v1/rooms/1/bookings/" -H "Content-Type: application/json" -d '{"start_time": "2027-01-17T10:00:00","end_time": "2027-01-17T12:00:00"}'
 
 3. read
 curl http://127.0.0.1:8000/api/v1/rooms/1/bookings/

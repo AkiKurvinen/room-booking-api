@@ -4,6 +4,7 @@ from app.db.session import SessionLocal
 from app.models import Room, Booking
 from app.schemas.booking import BookingCreate, Booking as BookingSchema
 from typing import Generator, List
+from datetime import datetime
 
 router = APIRouter()
 
@@ -25,6 +26,10 @@ def create_booking_for_room(
     room = db.query(Room).filter(Room.id == room_id).first()
     if not room:
         raise HTTPException(status_code=404, detail="Room not found")
+
+    # Ensure the booking time is not in the past
+    if booking.start_time < datetime.now().isoformat():
+        raise HTTPException(status_code=400, detail="Booking time cannot be in the past")
 
     # Check for overlapping bookings
     overlapping_booking = (

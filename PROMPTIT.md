@@ -799,8 +799,42 @@ Alternative Approaches
 Database Cleanup: Use Base.metadata.drop_all() and Base.metadata.create_all() to reset the database schema before each test.
 Mocking: If you want to avoid interacting with the real database, you can mock the database layer. However, this is less suitable for E2E tests.
 
-## update test_create_overlapping_booking test case
+## Update test_create_overlapping_booking test case
 
 I have updated the test_create_overlapping_booking test case in tests/test_endpoints.py. It now creates an initial valid booking and then attempts to create an overlapping booking, verifying the error response.
 
+## Load /api/v1/ from dotenv
+I have updated tests/test_endpoints.py to load the API prefix (/api/v1) dynamically from the .env file using dotenv. All hardcoded paths have been replaced with the API_PREFIX variable.
 
+## Create test case test_create_booking_in_past where booking takes place yesterday.
+
+I have added the test_create_booking_in_past test case in tests/test_endpoints.py. This test attempts to create a booking for yesterday and verifies that the API returns a 400 error with an appropriate message.
+
+def test_create_booking_in_past(client):
+    # Calculate yesterday's date
+    yesterday = datetime.now() - timedelta(days=1)
+    start_time = yesterday.replace(hour=10, minute=0, second=0, microsecond=0).isoformat()
+    end_time = yesterday.replace(hour=12, minute=0, second=0, microsecond=0).isoformat()
+
+    # Attempt to create a booking in the past
+    response = client.post(
+        f"{API_PREFIX}/rooms/1/bookings/",
+        json={"start_time": start_time, "end_time": end_time},
+    )
+    assert response.status_code == 400
+    assert "past" in response.json()["detail"].lower()
+
+## Update create endpoint so that booking time can not be in past
+I have updated the create_booking_for_room endpoint in app/api/v1/endpoints.py to ensure that booking times cannot be in the past. If the start_time is earlier than the current time, the API will return a 400 error with an appropriate message.
+
+## pytest no such table: rooms, please initialize db for tests based on init_database.py
+I have added a fixture in conftest.py to initialize the test database using init_database.py before running tests. This ensures the rooms table is created and populated.
+
+Please re-run your tests and let me know if further adjustments are needed!
+
+##  Configure so that tests use separate database from the dev app
+I have configured the tests in conftest.py to use a separate SQLite database (test_room_booking.db). This ensures that the test database is isolated from the development database.
+
+## Tests are failing because they use same db as the main app. Configure project so that new database is initialized when testing.
+
+The test_db fixture has been updated to use a separate temporary SQLite database for testing, and the missing imports for create_engine and sessionmaker have been added. There are no further errors in the conftest.py file. You can now re-run your tests to verify that they use an isolated test database. Let me know if you need further assistance!
