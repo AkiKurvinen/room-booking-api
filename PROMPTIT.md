@@ -919,3 +919,15 @@ Example:
 
 5. Use Pydantic Models for Validation
 Ensure all request and response data is validated using Pydantic models.
+
+## Should I use "should" format same in Jest etc.?
+Using the "should" format (e.g., test_should_create_booking) is common in JavaScript testing frameworks like Jest, but it is optional in Python/pytest. Both styles are accepted in pytest:
+
+test_create_booking (current style, concise and standard in Python)
+test_should_create_booking (explicit about expected behavior, more common in Jest)
+In Python, the current style is preferred for its simplicity and readability. However, if you want to make the expected outcome very clear, you can use the "should" format. The choice depends on your team's preference and consistency across your codebase. Both are valid.
+
+## ok change test names to use should and should not
+All test function names have been updated to use "should" for success cases and "should_not" for failure cases. This makes the expected outcome of each test clear and consistent.
+
+Let me know if you want further changes or improvements!

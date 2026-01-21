@@ -17,7 +17,6 @@ A. *Windows (Git Bash)*
 ```bash
 python -m venv .venv
 source .venv/Scripts/activate
-set TESTING=True && pytest
 ```
 
 B. *Windows (cmd or PowerShell)*
@@ -49,7 +48,6 @@ uvicorn app.main:app --reload
 ## Testing
 ```bash
 pytest
-set TESTING=True && pytest
 ```
 
 ## Format code

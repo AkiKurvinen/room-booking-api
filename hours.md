@@ -8,4 +8,5 @@
 20.1.2025
 8.00-12.00 test automation and validation
 7.10-7.50 analyysin kirjoittaminen
-7.50-9.25 ali-routerit ja refaktorointi
+7.50-9.25 reafactor routes and split files
+9.35-10.00 check and update tests

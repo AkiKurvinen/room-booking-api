@@ -9,7 +9,7 @@ from app.db.database import Base, get_db
 from init_database import init_db
 
 # Test database URL - use a separate test database
-TEST_DATABASE_URL = "sqlite:///./test.db"  # For SQLite
+TEST_DATABASE_URL = "sqlite:///./test_room_booking.db"  # For SQLite
 # TEST_DATABASE_URL = "postgresql://user:password@localhost/test_db"  # For PostgreSQL
 
 
