@@ -84,8 +84,5 @@ curl http://127.0.0.1:8000/api/v1/rooms/1/bookings/
 2. delete
 curl -X DELETE "http://127.0.0.1:8000/api/v1/bookings/1"
 
-
 ## TODO
-- Split endpoints to separate files
-- Separate test database
 - Protected routes and JWT auth
