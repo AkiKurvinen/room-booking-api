@@ -1,30 +1,32 @@
-from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, DateTime
-from sqlalchemy.orm import sessionmaker, declarative_base
+import os
+from typing import Generator
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, declarative_base, Session
 
-# SQLite database URL
-DATABASE_URL = "sqlite:///./room_booking.db"
+TESTING = os.getenv("TESTING", "False").lower() == "true"
+if TESTING:
+    SQLALCHEMY_DATABASE_URL = os.getenv(
+        "TEST_DATABASE_URL", "sqlite:///./test_room_booking.db"
+    )
+else:
+    SQLALCHEMY_DATABASE_URL = os.getenv(
+        "SQLALCHEMY_DATABASE_URL", "sqlite:///./room_booking.db"
+    )
 
-# Create the database engine
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 
-# Create a session
+def get_engine(database_url=SQLALCHEMY_DATABASE_URL):
+    connect_args = {"check_same_thread": False} if "sqlite" in database_url else {}
+    return create_engine(database_url, connect_args=connect_args)
+
+
+engine = get_engine()
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-# Base class for models
 Base = declarative_base()
 
 
-# Define the Room model
-class Room(Base):
-    __tablename__ = "rooms"
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, index=True)
-
-
-# Define the Booking model
-class Booking(Base):
-    __tablename__ = "bookings"
-    id = Column(Integer, primary_key=True, index=True)
-    room_id = Column(Integer, ForeignKey("rooms.id"), nullable=False)
-    start_time = Column(DateTime, nullable=False)
-    end_time = Column(DateTime, nullable=False)
+def get_db() -> Generator[Session, None, None]:
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()

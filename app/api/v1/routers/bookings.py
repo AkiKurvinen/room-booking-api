@@ -1,19 +1,20 @@
-import datetime
+from datetime import datetime
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
-from app.db.session import get_db
-from app.models import  Booking
+from app.db.database import get_db
+from app.models import Booking
 from app.models.room import Room
 from app.schemas.booking import BookingCreate
 
 router = APIRouter()
 
-@router.post("/bookings/", response_model=BookingCreate)
+
+@router.post("/", response_model=BookingCreate)
 async def create_booking_for_room(
-    room_id: int, booking: BookingCreate, db: Session = Depends(get_db)
+    booking: BookingCreate, db: Session = Depends(get_db)
 ) -> Booking:
     # Ensure the room exists
-    room = db.query(Room).filter(Room.id == room_id).first()
+    room = db.query(Room).filter(Room.id == booking.room_id).first()
     if not room:
         raise HTTPException(status_code=404, detail="Room not found")
 
@@ -33,7 +34,7 @@ async def create_booking_for_room(
     overlapping_booking = (
         db.query(Booking)
         .filter(
-            Booking.room_id == room_id,
+            Booking.room_id == booking.room_id,
             Booking.start_time < booking.end_time,
             Booking.end_time > booking.start_time,
         )
@@ -47,14 +48,17 @@ async def create_booking_for_room(
 
     # Create the booking tied to the room
     db_booking = Booking(
-        start_time=booking.start_time, end_time=booking.end_time, room_id=room_id
+        start_time=booking.start_time,
+        end_time=booking.end_time,
+        room_id=booking.room_id,
     )
     db.add(db_booking)
     db.commit()
     db.refresh(db_booking)
     return db_booking
 
-@router.delete("/bookings/{booking_id}", status_code=200)
+
+@router.delete("/{booking_id}", status_code=200)
 async def delete_booking(booking_id: int, db: Session = Depends(get_db)) -> dict:
     booking = db.query(Booking).filter(Booking.id == booking_id).first()
     if not booking:
@@ -62,4 +66,3 @@ async def delete_booking(booking_id: int, db: Session = Depends(get_db)) -> dict
     db.delete(booking)
     db.commit()
     return {"message": "Booking deleted successfully"}
-

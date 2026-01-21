@@ -12,8 +12,7 @@ DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 app = FastAPI(
     title="Room Booking API",
     description="API for managing room bookings",
-    version="1.0.0"
+    version="1.0.0",
 )
 
 app.include_router(api_router, prefix="/api/v1")
-

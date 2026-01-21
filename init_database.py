@@ -1,15 +1,19 @@
 from app.db.database import Base, engine, SessionLocal
-from app.db.database import Room, Booking
+from app.models.room import Room
+from app.models.booking import Booking
 from datetime import datetime
 
 
 # Initialize the database and add initial data
-def init_db():
+def init_db(session=None):
     # Create tables
     Base.metadata.create_all(bind=engine)
 
-    # Create a new session
-    session = SessionLocal()
+    # Use provided session or create a new one
+    own_session = False
+    if session is None:
+        session = SessionLocal()
+        own_session = True
 
     try:
         # Add initial data
@@ -22,7 +26,8 @@ def init_db():
         session.add(booking)
         session.commit()
     finally:
-        session.close()
+        if own_session:
+            session.close()
 
 
 if __name__ == "__main__":

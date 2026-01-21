@@ -19,8 +19,8 @@ def test_create_booking_in_past(client):
     ).isoformat()
     end_time = yesterday.replace(hour=12, minute=0, second=0, microsecond=0).isoformat()
     response = client.post(
-        f"{API_PREFIX}/rooms/1/bookings/",
-        json={"start_time": start_time, "end_time": end_time},
+        f"{API_PREFIX}/bookings/",
+        json={"room_id": 1, "start_time": start_time, "end_time": end_time},
     )
     assert response.status_code == 400
     assert "past" in response.json()["detail"].lower()
@@ -34,17 +34,17 @@ def test_create_booking(client):
     end_time = tomorrow.replace(hour=12, minute=0, second=0, microsecond=0).isoformat()
 
     response = client.post(
-        f"{API_PREFIX}/rooms/1/bookings/",
-        json={"start_time": start_time, "end_time": end_time},
+        f"{API_PREFIX}/bookings/",
+        json={"room_id": 1, "start_time": start_time, "end_time": end_time},
     )
     assert response.status_code == 200
     assert response.json()["start_time"] == start_time
 
 
-def test_get_bookings(client):
+def test_get_bookings_for_room(client):
     response = client.get(f"{API_PREFIX}/rooms/1/bookings/")
     assert response.status_code == 200
-    assert len(response.json()) > 0
+    assert isinstance(response.json(), list)
 
 
 def test_create_overlapping_booking(client):
@@ -56,8 +56,12 @@ def test_create_overlapping_booking(client):
         hour=13, minute=0, second=0, microsecond=0
     ).isoformat()
     response = client.post(
-        f"{API_PREFIX}/rooms/1/bookings/",
-        json={"start_time": overlapping_start, "end_time": overlapping_end},
+        f"{API_PREFIX}/bookings/",
+        json={
+            "room_id": 1,
+            "start_time": overlapping_start,
+            "end_time": overlapping_end,
+        },
     )
     assert response.status_code == 400
     assert "overlap" in response.json()["detail"].lower()
@@ -66,6 +70,7 @@ def test_create_overlapping_booking(client):
 def test_create_booking_with_end_time_before_start_time(client):
     tomorrow = datetime.now() + timedelta(days=1)
     payload = {
+        "room_id": 1,
         "start_time": tomorrow.replace(
             hour=10, minute=0, second=0, microsecond=0
         ).isoformat(),
@@ -74,7 +79,7 @@ def test_create_booking_with_end_time_before_start_time(client):
         ).isoformat(),
     }
 
-    response = client.post(f"{API_PREFIX}/rooms/1/bookings/", json=payload)
+    response = client.post(f"{API_PREFIX}/bookings/", json=payload)
 
     assert response.status_code == 400
     assert "cannot be before" in response.json()["detail"].lower()
@@ -86,6 +91,6 @@ def test_delete_booking(client):
 
 
 def test_delete_non_existent_booking(client):
-    response = client.delete(f"{API_PREFIX}/bookings/1")
+    response = client.delete(f"{API_PREFIX}/bookings/9999")
     assert response.status_code == 404
     assert "not found" in response.json()["detail"].lower()

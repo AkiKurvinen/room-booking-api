@@ -1,53 +1,62 @@
 import pytest
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 from fastapi.testclient import TestClient
+
 from app.main import app
-from app.db.database import Base, engine, SessionLocal, Room, Booking
-from app.db.session import get_db
-from datetime import datetime
+
+from app.db.database import Base, get_db
+from init_database import init_db
+
+# Test database URL - use a separate test database
+TEST_DATABASE_URL = "sqlite:///./test.db"  # For SQLite
+# TEST_DATABASE_URL = "postgresql://user:password@localhost/test_db"  # For PostgreSQL
 
 
-@pytest.fixture(scope="module")
-def test_db():
-    # Create tables in the test database
-    Base.metadata.create_all(bind=engine)
-
-    # Create a new session
-    session = SessionLocal()
-
-    try:
-        # Add initial data
-        room = Room(id=1, name="neukkari")
-        booking = Booking(
-            id=1, room_id=1, start_time=datetime.now(), end_time=datetime.now()
-        )
-
-        session.add(room)
-        session.add(booking)
-        session.commit()
-
-        yield session
-    finally:
-        session.close()
-        Base.metadata.drop_all(bind=engine)
+# Create test engine and sessionmaker at module level
+test_engine = create_engine(
+    TEST_DATABASE_URL,
+    connect_args={"check_same_thread": False} if "sqlite" in TEST_DATABASE_URL else {},
+)
+TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=test_engine)
 
 
-@pytest.fixture(scope="module")
-def client(test_db):
-    # Override the database dependency
+@pytest.fixture(scope="session")
+def db_engine():
+    """Create test database engine for the entire test session"""
+    # Create all tables once for the session
+    Base.metadata.create_all(bind=test_engine)
+    yield test_engine
+    # Optionally drop tables after all tests (uncomment if needed)
+    Base.metadata.drop_all(bind=test_engine)
+
+
+@pytest.fixture(scope="session")
+def db_session(db_engine):
+    """Create a single database session for the entire test session"""
+    session = TestingSessionLocal()
+    # Initialize database with test data once
+    init_db(session)
+    yield session
+    session.close()
+
+
+@pytest.fixture(scope="function")
+def client(db_session):
+    """Create a test client with overridden database dependency"""
+
     def override_get_db():
-        from sqlalchemy import create_engine
-        from sqlalchemy.orm import sessionmaker
-
-        test_engine = create_engine(f"sqlite:///{test_db}")
-        TestingSessionLocal = sessionmaker(
-            autocommit=False, autoflush=False, bind=test_engine
-        )
-        db = TestingSessionLocal()
         try:
-            yield db
+            yield db_session
         finally:
-            db.close()
+            pass  # Session cleanup is handled by db_session fixture
 
     app.dependency_overrides[get_db] = override_get_db
-    with TestClient(app) as client:
-        yield client
+
+    with TestClient(app) as test_client:
+        yield test_client
+
+    app.dependency_overrides.clear()
+
+
+# Optionally, you can keep a clean_db fixture for tests that need a clean database, but it should be session-scoped as well if you want persistence.

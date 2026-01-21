@@ -17,6 +17,7 @@ A. *Windows (Git Bash)*
 ```bash
 python -m venv .venv
 source .venv/Scripts/activate
+set TESTING=True && pytest
 ```
 
 B. *Windows (cmd or PowerShell)*
@@ -48,6 +49,7 @@ uvicorn app.main:app --reload
 ## Testing
 ```bash
 pytest
+set TESTING=True && pytest
 ```
 
 ## Format code
@@ -76,7 +78,7 @@ http://127.0.0.1:8000/api/v1/rooms/1/bookings/
 ### Curl
 
 1. create
-curl -X POST "http://127.0.0.1:8000/api/v1/rooms/1/bookings/" -H "Content-Type: application/json" -d '{"start_time": "2027-01-17T10:00:00","end_time": "2027-01-17T12:00:00"}'
+curl -X POST "http://127.0.0.1:8000/api/v1/bookings/" -H "Content-Type: application/json" -d '{"room_id":1, "start_time": "2027-01-17T10:00:00","end_time": "2027-01-17T12:00:00"}'
 
 3. read
 curl http://127.0.0.1:8000/api/v1/rooms/1/bookings/

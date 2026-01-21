@@ -7,7 +7,7 @@ class BookingBase(BaseModel):
 
 
 class BookingCreate(BookingBase):
-    pass
+    room_id: int
 
 
 class Booking(BookingBase):
