@@ -7,3 +7,4 @@
 
 20.1.2025
 8.00-12.00 test automation and validation
+7.10-7.50 analyysin kirjoittaminen
