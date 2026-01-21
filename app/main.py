@@ -1,19 +1,19 @@
 from fastapi import FastAPI
-from app.api.v1.endpoints import router
-
+from app.api.v1.api import api_router
 from dotenv import load_dotenv
 import os
 
-# Load environment variables from .env file
 load_dotenv()
 
-# Access environment variables
-API_URL = os.getenv("API_URL", "/api/v1")  # Default to /api/v1 if not set
+API_URL = os.getenv("API_URL", "/api/v1")
 DATABASE_URL = os.getenv("SQLALCHEMY_DATABASE_URL")
 DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 
-# Initialize FastAPI app
-app = FastAPI()
+app = FastAPI(
+    title="Room Booking API",
+    description="API for managing room bookings",
+    version="1.0.0"
+)
 
-# Include API router
-app.include_router(router, prefix=API_URL)
+app.include_router(api_router, prefix="/api/v1")
+

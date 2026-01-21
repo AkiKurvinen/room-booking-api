@@ -1,25 +1,15 @@
+import datetime
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
-from app.db.session import SessionLocal
-from app.models import Room, Booking
-from app.schemas.booking import BookingCreate, Booking as BookingSchema
-from typing import Generator, List
-from datetime import datetime
+from app.db.session import get_db
+from app.models import  Booking
+from app.models.room import Room
+from app.schemas.booking import BookingCreate
 
 router = APIRouter()
 
-
-def get_db() -> Generator[Session, None, None]:
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
-# CREATE
-@router.post("/rooms/{room_id}/bookings/", response_model=BookingSchema)
-def create_booking_for_room(
+@router.post("/bookings/", response_model=BookingCreate)
+async def create_booking_for_room(
     room_id: int, booking: BookingCreate, db: Session = Depends(get_db)
 ) -> Booking:
     # Ensure the room exists
@@ -64,33 +54,12 @@ def create_booking_for_room(
     db.refresh(db_booking)
     return db_booking
 
-
-# READ
-@router.get("/")
-def read_root() -> dict:
-    return {"message": "Room Booking API is running"}
-
-
-@router.get("/rooms/{room_id}/bookings/", response_model=List[BookingSchema])
-def read_bookings_for_room(
-    room_id: int, db: Session = Depends(get_db)
-) -> List[Booking]:
-    bookings = db.query(Booking).filter(Booking.room_id == room_id).all()
-    if not bookings:
-        raise HTTPException(status_code=404, detail="No bookings found for this room")
-    return bookings
-
-
-# UPDATE
-"""no endpoints"""
-
-
-# DELETE
 @router.delete("/bookings/{booking_id}", status_code=200)
-def delete_booking(booking_id: int, db: Session = Depends(get_db)) -> dict:
+async def delete_booking(booking_id: int, db: Session = Depends(get_db)) -> dict:
     booking = db.query(Booking).filter(Booking.id == booking_id).first()
     if not booking:
         raise HTTPException(status_code=404, detail="Booking not found")
     db.delete(booking)
     db.commit()
     return {"message": "Booking deleted successfully"}
+
